@@ -25,13 +25,13 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         # Add the sub-entries for Thermal
         for i in self.smbios.thermal_modes:
-            sub_entry = QAction(self.capitalize(self.replace(i, ['_', '-'], ' ')), self) # Set the text to the mode name
+            sub_entry = QAction(self.format(i), self) # Set the text to the mode name
             sub_entry.triggered.connect(lambda _, i=i: self.set_thermal(i)) # Set the action to set the thermal mode
             thermal_entry.addAction(sub_entry) # Add the sub-entry to the menu
 
         # Add the sub-entries for Battery
         for i in self.smbios.battery_modes:
-            sub_entry = QAction(self.capitalize(self.replace(i, ['_', '-'], ' ')), self) # Set the text to the mode name
+            sub_entry = QAction(self.format(i), self) # Set the text to the mode name
             sub_entry.triggered.connect(lambda _, i=i: self.set_battery(i)) # Set the action to set the battery mode
             battery_entry.addAction(sub_entry) # Add the sub-entry to the menu
 
@@ -48,14 +48,14 @@ class SystemTrayIcon(QSystemTrayIcon):
         print(f"Set Thermal {mode}")
         self.smbios.set_thermal(mode)
         self.thermal_mode = self.smbios.get_thermal()
-        self.menu.actions()[0].setText(f"Current Thermal Mode: {self.capitalize(self.replace(self.thermal_mode, ['_', '-'], ' '))}")
+        self.menu.actions()[0].setText(f"Current Thermal Mode: {self.format(self.thermal_mode)}")
         self.icon_refresh()
 
     def set_battery(self, mode):
         print(f"Set Battery {mode}")
         self.smbios.set_battery(mode)
         self.battery_mode = self.smbios.get_battery()
-        self.menu.actions()[1].setText(f"Current Battery Mode: {self.capitalize(self.replace(self.battery_mode, ['_', '-'], ' '))}")
+        self.menu.actions()[1].setText(f"Current Battery Mode: {self.format(self.battery_mode)}")
 
     def icon_refresh(self):
         # Set dynamic icons if the system is running KDE
@@ -78,6 +78,13 @@ class SystemTrayIcon(QSystemTrayIcon):
     # Helper method to capitalize all words in a string
     def capitalize(self, string):
         return ' '.join([i.capitalize() for i in string.split()])
+
+    # Helper method to format strings for the menu
+    def format(self, string):
+        # Replace all underscores and dashes with spaces
+        string = self.capitalize(self.replace(string, ['_', '-'], ' '))
+        # Make all words containing 2 or less characters uppercase
+        return ' '.join([i.upper() if len(i) <= 2 else i for i in string.split()])
 
     # Function to detect if the system is running KDE or not
     def is_kde(self):
