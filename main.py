@@ -1,4 +1,4 @@
-import sys, smbios_interface, os, subprocess, shutil
+import sys, smbios_interface, os
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
 from PyQt5.QtGui import QIcon
 
@@ -55,16 +55,16 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.menu.actions()[1].setText(f"Current Battery Mode: {self.capitalize(self.replace(self.battery_mode, ['_', '-'], ' '))}")
 
     def icon_refresh(self):
-        # Update the icon
-        print(f"Icon refresh: {self.thermal_mode}")
-        if (self.thermal_mode == "balanced"):
-            self.setIcon(QIcon.fromTheme("face-smile"))
-        elif (self.thermal_mode == "cool-bottom"):
-            self.setIcon(QIcon.fromTheme("face-cool"))
-        elif (self.thermal_mode == "quiet"):
-            self.setIcon(QIcon.fromTheme("face-ninja"))
-        elif (self.thermal_mode == "performance"):
-            self.setIcon(QIcon.fromTheme("face-devilish"))
+        # Set dynamic icons if the system is running KDE
+        if (self.is_kde()):
+            if (self.thermal_mode == "balanced"):
+                self.setIcon(QIcon.fromTheme("face-smile"))
+            elif (self.thermal_mode == "cool-bottom"):
+                self.setIcon(QIcon.fromTheme("face-cool"))
+            elif (self.thermal_mode == "quiet"):
+                self.setIcon(QIcon.fromTheme("face-ninja"))
+            elif (self.thermal_mode == "performance"):
+                self.setIcon(QIcon.fromTheme("face-devilish"))
 
     # Helper method to replace mulitple characters in a string
     def replace(self, string, chars, replacement):
@@ -75,6 +75,10 @@ class SystemTrayIcon(QSystemTrayIcon):
     # Helper method to capitalize all words in a string
     def capitalize(self, string):
         return ' '.join([i.capitalize() for i in string.split()])
+
+    # Function to detect if the system is running KDE or not
+    def is_kde(self):
+        return os.environ.get("XDG_CURRENT_DESKTOP") == "KDE"
 
 
 # Method to install to ~/.local/share/applications
@@ -122,13 +126,14 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Set initial icon
-    icon = QIcon.fromTheme("face-smile")
+    icon = QIcon.fromTheme(f"{os.path.dirname(os.path.realpath(__file__))}/icon.png")
 
     # Create the system tray icon
     tray_icon = SystemTrayIcon()
     tray_icon.setIcon(icon)
     tray_icon.setVisible(True)
-    tray_icon.icon_refresh()
+    if (tray_icon.is_kde()):
+        tray_icon.icon_refresh()
 
     # Run the application
     sys.exit(app.exec_())
