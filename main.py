@@ -91,48 +91,27 @@ class SystemTrayIcon(QSystemTrayIcon):
         return os.environ.get("XDG_CURRENT_DESKTOP") == "KDE"
 
 
-# Method to install to ~/.local/share/applications
-def install():
-    # Get the current directory
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    # Get python path
-    python_path = os.popen("which python3").read().strip()
-
-    # Create the .desktop file
-    desktop_file = f"""[Desktop Entry]
-    Name=Dell Power Tray
-    Comment=Power management for Dell laptops
-    Exec={python_path} {current_dir}/main.py
-    Icon={current_dir}/icon.png
-    Terminal=false
-    Type=Application
-    Categories=Utility;"""
-
-    # Write the .desktop file to the current users .local/share/applications directory
-    home = os.path.expanduser("~")
-    with open(f"{home}/.local/share/applications/dell-power-tray.desktop", "w") as f:
-        f.write(desktop_file)
-
-# Uninstall from ~/.local/share/applications
-def uninstall():
-    # remove file
-    home = os.path.expanduser("~")
-    os.remove(f"{home}/.local/share/applications/dell-power-tray.desktop")
-
-
 # Main method
 if __name__ == "__main__":
-    # Check for install/uninstall flags
+    # Check for flags
     for i in sys.argv:
-        if (i == "--install"):
-            install()
-            print("Installed. The application should now appear in your application menu.")
+        if (i == "--help" or i == '-h' or i == "-?"):
+            print("Dell Power Tray")
+            print("Usage: dell-power-tray [OPTION]")
+            print("Options:")
+            print("  --install\tInstall the application")
+            print("  --uninstall\tUninstall the application")
+            print("  --help\tDisplay this help message")
             sys.exit(0)
-        elif (i == "--uninstall"):
-            uninstall()
-            print("Uninstalled. The application should no longer appear in your application menu.")
+        if (i == "--install" or i == '-i' or i == "--uninstall" or i == '-u'):
+            import installer
+            if (i == "--install" or i == '-i'):
+                installer.install()
+            elif (i == "--uninstall" or i == '-u'):
+                installer.uninstall()
             sys.exit(0)
 
+    # Create the application
     app = QApplication(sys.argv)
 
     # Set initial icon
