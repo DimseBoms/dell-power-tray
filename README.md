@@ -1,2 +1,2 @@
 # dell-power-tray
-Dell Power Tray for KDE Plasma
+Dell power tray for KDE Plasma
