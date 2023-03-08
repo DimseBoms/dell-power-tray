@@ -83,7 +83,6 @@ def install():
     current_dir = os.path.dirname(os.path.realpath(__file__))
     # Get python path
     python_path = os.popen("which python3").read().strip()
-    print(python_path)
 
     # Create the .desktop file
     desktop_file = f"""[Desktop Entry]
