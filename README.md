@@ -37,7 +37,7 @@ python3 main.py
 ```
 python3 main.py --install
 ```
-* To be able to run the necessary commands without typing sudo you need to add this to the bottom of /etc/sudoers using visudo:
+* To be able to run the necessary backend commands without having to run the app from the terminal for the sudo password you need to add this to the bottom of /etc/sudoers using visudo:
 ```
 sudo visudo
 ```
