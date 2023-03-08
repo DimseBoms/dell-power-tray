@@ -1,4 +1,4 @@
-import sys, smbios_interface
+import sys, smbios_interface, os, subprocess, shutil
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
 from PyQt5.QtGui import QIcon
 
@@ -41,9 +41,6 @@ class SystemTrayIcon(QSystemTrayIcon):
         # Set the menu
         self.setContextMenu(self.menu)
 
-        # Refresh the icon
-        self.icon_refresh()
-
     def set_thermal(self, mode):
         print(f"Set Thermal {mode}")
         self.smbios.set_thermal(mode)
@@ -80,7 +77,49 @@ class SystemTrayIcon(QSystemTrayIcon):
         return ' '.join([i.capitalize() for i in string.split()])
 
 
+# Method to install to ~/.local/share/applications
+def install():
+    # Get the current directory
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    # Get python path
+    python_path = os.popen("which python3").read().strip()
+    print(python_path)
+
+    # Create the .desktop file
+    desktop_file = f"""[Desktop Entry]
+    Name=Dell Power Tray
+    Comment=Power management for Dell laptops
+    Exec={python_path} {current_dir}/main.py
+    Icon={current_dir}/icon.png
+    Terminal=false
+    Type=Application
+    Categories=Utility;"""
+
+    # Write the .desktop file to the current users .local/share/applications directory
+    home = os.path.expanduser("~")
+    with open(f"{home}/.local/share/applications/dell-power-tray.desktop", "w") as f:
+        f.write(desktop_file)
+
+# Uninstall from ~/.local/share/applications
+def uninstall():
+    # remove file
+    home = os.path.expanduser("~")
+    os.remove(f"{home}/.local/share/applications/dell-power-tray.desktop")
+
+
+# Main method
 if __name__ == "__main__":
+    # Check for install/uninstall flags
+    for i in sys.argv:
+        if (i == "--install"):
+            install()
+            print("Installed. The application should now appear in your application menu.")
+            sys.exit(0)
+        elif (i == "--uninstall"):
+            uninstall()
+            print("Uninstalled. The application should no longer appear in your application menu.")
+            sys.exit(0)
+
     app = QApplication(sys.argv)
 
     # Set initial icon
@@ -91,7 +130,6 @@ if __name__ == "__main__":
     tray_icon.setIcon(icon)
     tray_icon.setVisible(True)
     tray_icon.icon_refresh()
-
 
     # Run the application
     sys.exit(app.exec_())
