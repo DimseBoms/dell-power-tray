@@ -19,7 +19,9 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         # Add the main entries
         thermal_entry = self.menu.addMenu(f"Current Thermal Mode: {self.capitalize(self.replace(self.thermal_mode, ['_', '-'], ' '))}")
+        thermal_entry.setIcon(QIcon.fromTheme("temperature-normal"))
         battery_entry = self.menu.addMenu(f"Current Battery Mode: {self.capitalize(self.replace(self.battery_mode, ['_', '-'], ' '))}")
+        battery_entry.setIcon(QIcon.fromTheme("battery-normal"))
 
         # Add the sub-entries for Thermal
         for i in self.smbios.thermal_modes:
@@ -35,6 +37,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         # Add the exit button
         exit_button = QAction("Exit", self)
+        exit_button.setIcon(QIcon.fromTheme("application-exit"))
         exit_button.triggered.connect(QApplication.quit)
         self.menu.addAction(exit_button)
 
