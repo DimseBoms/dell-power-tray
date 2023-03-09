@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.kde = self.is_kde()
 
         # Initialize smbios interface and get the current thermal and battery modes
         self.smbios = smbios_interface.smbiosInterface()
@@ -18,10 +19,11 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.menu = QMenu()
 
         # Add the main entries
-        thermal_entry = self.menu.addMenu(f"Current Thermal Mode: {self.capitalize(self.replace(self.thermal_mode, ['_', '-'], ' '))}")
-        thermal_entry.setIcon(QIcon.fromTheme("temperature-normal"))
-        battery_entry = self.menu.addMenu(f"Current Battery Mode: {self.capitalize(self.replace(self.battery_mode, ['_', '-'], ' '))}")
-        battery_entry.setIcon(QIcon.fromTheme("battery-normal"))
+        thermal_entry = self.menu.addMenu(f"Current Thermal Mode: {self.format(self.thermal_mode)}")
+        battery_entry = self.menu.addMenu(f"Current Battery Mode: {self.format(self.battery_mode)}")
+        if self.kde:
+            thermal_entry.setIcon(QIcon.fromTheme("temperature-normal"))
+            battery_entry.setIcon(QIcon.fromTheme("battery-normal"))
 
         # Add the sub-entries for Thermal
         for i in self.smbios.thermal_modes:
@@ -37,7 +39,8 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         # Add the exit button
         exit_button = QAction("Exit", self)
-        exit_button.setIcon(QIcon.fromTheme("application-exit"))
+        if self.kde:
+            exit_button.setIcon(QIcon.fromTheme("application-exit"))
         exit_button.triggered.connect(QApplication.quit)
         self.menu.addAction(exit_button)
 
@@ -59,15 +62,15 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     def icon_refresh(self):
         # Set dynamic icons if the system is running KDE
-        if (self.is_kde()):
+        if (self.kde):
             if (self.thermal_mode == "balanced"):
-                self.setIcon(QIcon.fromTheme("face-smile"))
+                self.setIcon(QIcon(f"{dir}/icons/breeze/face-smile-grin.svg"))
             elif (self.thermal_mode == "cool-bottom"):
-                self.setIcon(QIcon.fromTheme("face-cool"))
+                self.setIcon(QIcon(f"{dir}/icons/breeze/face-cool.svg"))
             elif (self.thermal_mode == "quiet"):
-                self.setIcon(QIcon.fromTheme("face-ninja"))
+                self.setIcon(QIcon(f"{dir}/icons/breeze/face-ninja.svg"))
             elif (self.thermal_mode == "performance"):
-                self.setIcon(QIcon.fromTheme("face-devilish"))
+                self.setIcon(QIcon(f"{dir}/icons/breeze/face-devilish.svg"))
 
     # Helper method to replace mulitple characters in a string
     def replace(self, string, chars, replacement):
@@ -114,14 +117,17 @@ if __name__ == "__main__":
     # Create the application
     app = QApplication(sys.argv)
 
+    # Get application directory
+    dir = os.path.dirname(os.path.realpath(__file__))
+
     # Set initial icon
-    icon = QIcon.fromTheme(f"{os.path.dirname(os.path.realpath(__file__))}/icon.png")
+    icon = QIcon.fromTheme(f"{dir}/icons/breeze/face-smile-grin.svg")
 
     # Create the system tray icon
     tray_icon = SystemTrayIcon()
     tray_icon.setIcon(icon)
     tray_icon.setVisible(True)
-    if (tray_icon.is_kde()):
+    if (tray_icon.kde):
         tray_icon.icon_refresh()
 
     # Run the application
