@@ -12,7 +12,7 @@ def install():
     Name=Dell Power Tray
     Comment=Power management for Dell laptops
     Exec={python_path} {current_dir}/main.py
-    Icon={current_dir}/icon.png
+    Icon={current_dir}/icons/icon.png
     Terminal=false
     Type=Application
     Categories=Utility;"""
