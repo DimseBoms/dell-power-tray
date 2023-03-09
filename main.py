@@ -1,6 +1,7 @@
-import sys, smbios_interface, os
+import sys, os, smbios_interface
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
 from PyQt5.QtGui import QIcon
+from external_power_monitor import external_power_monitor
 
 
 class SystemTrayIcon(QSystemTrayIcon):
@@ -11,6 +12,11 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.smbios = smbios_interface.smbiosInterface()
         self.thermal_mode = self.smbios.get_thermal()
         self.battery_mode = self.smbios.get_battery()
+
+        # Initialize the ExternalPowerMonitor
+        self.external_power_monitor = external_power_monitor()
+        self.external_power_monitor.add_observer_callback(self.on_external_power_change)
+        self.external_power_monitor.start()
         
         self.setToolTip("Dell Power Tray")
 
@@ -43,6 +49,19 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         # Set the menu
         self.setContextMenu(self.menu)
+
+    # Handle external power changes
+    def on_external_power_change(self, power_type, is_connected):
+        if power_type == 'external_monitor_connected':
+            if is_connected:
+                print('External monitor connected')
+            else:
+                print('External monitor disconnected')
+        elif power_type == 'laptop_power_connected':
+            if is_connected:
+                print('Laptop power connected')
+            else:
+                print('Laptop power disconnected')
 
     def set_thermal(self, mode):
         print(f"Set Thermal {mode}")
