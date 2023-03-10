@@ -12,7 +12,16 @@ sudo dnf install smbios-utils-bin
 # On Ubuntu
 sudo apt update && sudo apt install smbios-utils
 ```
-* PyQt5 (Can be installed with pip. See instructions below)
+* Python package manager: pip
+```
+# On Fedora
+sudo dnf install python3-pip 
+```
+```
+# On Ubuntu
+sudo apt update && sudo apt install python3-pip
+```
+* PyQt5 (Installed via pip. See instructions below)
 # Installation
 * Navigate to where you want your project to reside:
 ```
@@ -45,7 +54,7 @@ sudo visudo
 ```
 ```
 # Dell Power Tray
-YOUR_USERNAME_HERE ALL = NOPASSWD: /usr/sbin/smbios-sys-info
-YOUR_USERNAME_HERE ALL = NOPASSWD: /usr/sbin/smbios-thermal-ctl
-YOUR_USERNAME_HERE ALL = NOPASSWD: /usr/sbin/smbios-battery-ctl
+your_username_here ALL = NOPASSWD: /usr/sbin/smbios-battery-ctl
+your_username_here ALL = NOPASSWD: /usr/sbin/smbios-sys-info
+your_username_here ALL = NOPASSWD: /usr/sbin/smbios-thermal-ctl
 ```
