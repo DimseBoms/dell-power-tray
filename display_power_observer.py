@@ -6,10 +6,6 @@ class DisplayPowerObserver:
     def __init__(self):
         self.drm_path = "/sys/class/drm" # The path to the sysfs drm directory
         self.power_path = "/sys/class/power_supply" # The path to the sysfs power supply directory
-        self.displays = self.get_display_names()
-        self.powers = self.get_power_sources()
-        print(f"Connected displays: {self.displays}")
-        print(f"Connected power sources: {self.powers}")
 
     # Returns the names of all connected displays as a list
     def get_display_names(self):
@@ -51,6 +47,8 @@ class DisplayPowerObserver:
 
     # Returns True if the laptop is docked, False otherwise
     def is_docked(self):
+        self.displays = self.get_display_names()
+        self.powers = self.get_power_sources()
         docked = False
         if len(self.displays) > 1 and len(self.powers) > 0:
             docked = True
