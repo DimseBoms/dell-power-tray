@@ -49,11 +49,3 @@ YOUR_USERNAME_HERE ALL = NOPASSWD: /usr/sbin/smbios-sys-info
 YOUR_USERNAME_HERE ALL = NOPASSWD: /usr/sbin/smbios-thermal-ctl
 YOUR_USERNAME_HERE ALL = NOPASSWD: /usr/sbin/smbios-battery-ctl
 ```
-* Keep in mind that the location of smbios binaries may be different on your distro. To find the location of the binaries you can use *which* or *whereis*
-```
-which smbios-sys-info
-```
-or
-```
-whereis smbios-sys-info
-```
