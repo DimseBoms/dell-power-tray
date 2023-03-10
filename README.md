@@ -1,5 +1,7 @@
 # dell-power-tray
-Power management for Dell laptops. Only tested with KDE
+Power management for Dell laptops
+
+![Example Image](./images/image.png)
 # Requirements
 * libsmbios binary utilities (https://github.com/dell/libsmbios). This one is probably available in your package manager.
 ```
