@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Last thermal mode
+last_thermal_mode
+
+# User settings
+settings.json
