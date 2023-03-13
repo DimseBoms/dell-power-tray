@@ -168,16 +168,14 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     # Refresh icons after thermal mode change
     def icon_refresh(self):
-        # Set dynamic icons if the system is running KDE
-        if (self.kde):
-            if (self.thermal_mode == "balanced"):
-                self.setIcon(QIcon(f"{dir}/icons/breeze/face-smile-grin.svg"))
-            elif (self.thermal_mode == "cool-bottom"):
-                self.setIcon(QIcon(f"{dir}/icons/breeze/face-cool.svg"))
-            elif (self.thermal_mode == "quiet"):
-                self.setIcon(QIcon(f"{dir}/icons/breeze/face-ninja.svg"))
-            elif (self.thermal_mode == "performance"):
-                self.setIcon(QIcon(f"{dir}/icons/breeze/face-devilish.svg"))
+        if (self.thermal_mode == "balanced"):
+            self.setIcon(QIcon(f"{dir}/icons/breeze/face-smile-grin.svg"))
+        elif (self.thermal_mode == "cool-bottom"):
+            self.setIcon(QIcon(f"{dir}/icons/breeze/face-cool.svg"))
+        elif (self.thermal_mode == "quiet"):
+            self.setIcon(QIcon(f"{dir}/icons/breeze/face-ninja.svg"))
+        elif (self.thermal_mode == "performance"):
+            self.setIcon(QIcon(f"{dir}/icons/breeze/face-devilish.svg"))
 
     # Helper method to replace mulitple characters in a string
     def replace(self, string, chars, replacement):
