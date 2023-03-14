@@ -1,4 +1,4 @@
-import subprocess, sys, os
+import sys, os
 
 class smbiosInterface:
     def __init__(self):
