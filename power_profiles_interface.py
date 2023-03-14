@@ -33,7 +33,7 @@ class PowerProfilesInterface:
     # Returns the currenctly selected power profile
     def get_power_profile(self):
         if not self.available: return "unknown"
-        return os.popen(f"{self.cmd} get").read().lower().strip()
+        return os.popen(f"{self.cmd} get").read().strip()
 
     # Sets the power profile
     def set_thermal(self, profile):
