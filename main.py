@@ -260,8 +260,7 @@ if __name__ == "__main__":
     tray_icon = SystemTrayIcon()
     tray_icon.setIcon(icon)
     tray_icon.setVisible(True)
-    if (tray_icon.kde):
-        tray_icon.icon_refresh()
+    tray_icon.icon_refresh()
 
     # Run the application
     sys.exit(app.exec_())
