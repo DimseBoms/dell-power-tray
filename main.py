@@ -34,26 +34,34 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.menu = QMenu()
 
         # Add the main entries
-        thermal_entry = self.menu.addMenu(f"Current Thermal Mode: {self.format(self.thermal_mode)}")
-        battery_entry = self.menu.addMenu(f"Current Battery Mode: {self.format(self.battery_mode)}")
+        self.thermal_entry = self.menu.addMenu(f"Current Thermal Mode:\t\t{self.format(self.thermal_mode)}")
+        self.battery_entry = self.menu.addMenu(f"Current Battery Mode:\t\t{self.format(self.battery_mode)}")
         if self.kde:
-            thermal_entry.setIcon(QIcon.fromTheme("temperature-normal"))
-            battery_entry.setIcon(QIcon.fromTheme("battery-normal"))
+            self.thermal_entry.setIcon(QIcon.fromTheme("temperature-normal"))
+            self.battery_entry.setIcon(QIcon.fromTheme("battery-normal"))
 
         # Add the sub-entries for Thermal
         for i in self.smbios.thermal_modes:
             sub_entry = QAction(self.format(i), self) # Set the text to the mode name
             sub_entry.triggered.connect(lambda _, i=i: self.set_thermal(i, write=True)) # Set the action to set the thermal mode
-            thermal_entry.addAction(sub_entry) # Add the sub-entry to the menu
+            sub_entry.setCheckable(True)
+            if i == self.thermal_mode: # If the current thermal mode is selected it should be checked
+                sub_entry.setChecked(True)
+            self.thermal_entry.addAction(sub_entry) # Add the sub-entry to the menu
 
         # Add the sub-entries for Battery
         for i in self.smbios.battery_modes:
             sub_entry = QAction(self.format(i), self) # Set the text to the mode name
             sub_entry.triggered.connect(lambda _, i=i: self.set_battery(i)) # Set the action to set the battery mode
-            battery_entry.addAction(sub_entry) # Add the sub-entry to the menu
+            sub_entry.setCheckable(True)
+            if i == self.battery_mode: # If the current battery mode is selected it should be checked
+                sub_entry.setChecked(True)
+            self.battery_entry.addAction(sub_entry) # Add the sub-entry to the menu
+
+        self.menu.addSeparator()
 
         # Add button to enable/disable auto-perf-on-dock
-        auto_perf_on_dock_entry = QAction(f"Automatic performance mode when docked: {self.settings['auto-perf-on-dock']}", self)
+        auto_perf_on_dock_entry = QAction(f"Automatic performance mode when docked", self)
         auto_perf_on_dock_entry.setChecked(self.settings["auto-perf-on-dock"])
         if self.kde:
             auto_perf_on_dock_entry.setIcon(QIcon.fromTheme("preferences-system"))
@@ -61,6 +69,8 @@ class SystemTrayIcon(QSystemTrayIcon):
         auto_perf_on_dock_entry.setChecked(self.settings["auto-perf-on-dock"])
         auto_perf_on_dock_entry.triggered.connect(self.toggle_auto_perf_on_dock)
         self.menu.addAction(auto_perf_on_dock_entry)
+
+        self.menu.addSeparator()
 
         # Add the exit button
         exit_button = QAction("Exit", self)
@@ -154,7 +164,12 @@ class SystemTrayIcon(QSystemTrayIcon):
         print(f"Set Thermal {mode}")
         self.smbios.set_thermal(mode)
         self.thermal_mode = self.smbios.get_thermal()
-        self.menu.actions()[0].setText(f"Current Thermal Mode: {self.format(self.thermal_mode)}")
+        self.menu.actions()[0].setText(f"Current Thermal Mode:\t\t{self.format(self.thermal_mode)}")
+        for action in self.thermal_entry.actions(): # Make sure the correct thermal mode is checked
+            if action.text() == self.format(mode):
+                action.setChecked(True)
+            else:
+                action.setChecked(False)
         self.icon_refresh()
         if write:
             self.write_last_thermal_mode(mode)
@@ -164,7 +179,12 @@ class SystemTrayIcon(QSystemTrayIcon):
         print(f"Set Battery {mode}")
         self.smbios.set_battery(mode)
         self.battery_mode = self.smbios.get_battery()
-        self.menu.actions()[1].setText(f"Current Battery Mode: {self.format(self.battery_mode)}")
+        self.menu.actions()[1].setText(f"Current Battery Mode:\t\t{self.format(self.battery_mode)}")
+        for action in self.battery_entry.actions(): # Make sure the correct battery mode is checked
+            if action.text() == self.format(mode):
+                action.setChecked(True)
+            else:
+                action.setChecked(False)
 
     # Refresh icons after thermal mode change
     def icon_refresh(self):
