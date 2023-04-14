@@ -34,8 +34,8 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.menu = QMenu()
 
         # Add the main entries
-        self.thermal_entry = self.menu.addMenu(f"Current Thermal Mode:\t\t{self.format(self.thermal_mode)}")
-        self.battery_entry = self.menu.addMenu(f"Current Battery Mode:\t\t{self.format(self.battery_mode)}")
+        self.thermal_entry = self.menu.addMenu(f"Current Thermal Mode:\t{self.format(self.thermal_mode)}")
+        self.battery_entry = self.menu.addMenu(f"Current Battery Mode:\t{self.format(self.battery_mode)}")
         if self.kde:
             self.thermal_entry.setIcon(QIcon.fromTheme("temperature-normal"))
             self.battery_entry.setIcon(QIcon.fromTheme("battery-normal"))
@@ -164,7 +164,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         print(f"Set Thermal {mode}")
         self.smbios.set_thermal(mode)
         self.thermal_mode = self.smbios.get_thermal()
-        self.menu.actions()[0].setText(f"Current Thermal Mode:\t\t{self.format(self.thermal_mode)}")
+        self.menu.actions()[0].setText(f"Current Thermal Mode:\t{self.format(self.thermal_mode)}")
         for action in self.thermal_entry.actions(): # Make sure the correct thermal mode is checked
             if action.text() == self.format(mode):
                 action.setChecked(True)
@@ -179,7 +179,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         print(f"Set Battery {mode}")
         self.smbios.set_battery(mode)
         self.battery_mode = self.smbios.get_battery()
-        self.menu.actions()[1].setText(f"Current Battery Mode:\t\t{self.format(self.battery_mode)}")
+        self.menu.actions()[1].setText(f"Current Battery Mode:\t{self.format(self.battery_mode)}")
         for action in self.battery_entry.actions(): # Make sure the correct battery mode is checked
             if action.text() == self.format(mode):
                 action.setChecked(True)
