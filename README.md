@@ -58,3 +58,6 @@ your_username_here ALL = NOPASSWD: /usr/sbin/smbios-battery-ctl
 your_username_here ALL = NOPASSWD: /usr/sbin/smbios-sys-info
 your_username_here ALL = NOPASSWD: /usr/sbin/smbios-thermal-ctl
 ```
+
+# Run custom scripts when docked/undocked
+To run custom scripts when the machine is docked/undocked you can simply add the code you want to run in `/custom_scripts/on_dock.sh` or `/custom_scripts/off_dock.sh` depending on if you want it to run when the dock is connected or disconnected. You can find examples that you can modify in the custom script folder. To enable the function you have to tick off the option "Run custom scripts when docked" in the options menu.
