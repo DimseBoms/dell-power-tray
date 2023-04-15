@@ -1,4 +1,4 @@
-import sys, os, smbios_interface, json, traceback
+import sys, os, smbios_interface, json
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QTimer
@@ -104,22 +104,29 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.check_docking_status)
 
-        # If settings auto-perf-on-dock is true enable auto-perf-on-dock
-        if self.settings["auto-perf-on-dock"]:
-            self.enable_auto_perf_on_dock()
+        # If settings auto-perf-on-dock or custom-scripts-on-dock
+        # is enabled trigger the timer handler
+        if self.settings["auto-perf-on-dock"] or self.settings["custom-scripts-on-dock"]:
+            self.handle_timer_state_change()
+
+        # Initial run of custom scripts if the setting is enabled
+        if self.settings["custom-scripts-on-dock"]:
+            self.run_custom_scripts(self.last_dock_state)
         
     # Toggle auto-perf-on-dock'
     def toggle_auto_perf_on_dock(self):
-        if self.timer.isActive():
-            self.disable_auto_perf_on_dock()
+        if self.settings["auto-perf-on-dock"]:
+            self.set_thermal(self.last_thermal_mode)
             self.settings["auto-perf-on-dock"] = False
             self.write_settings()
             print("Auto Perf on Dock disabled")
         else:
-            self.enable_auto_perf_on_dock()
+            if self.display_power_observer.is_docked():
+                self.set_thermal("performance")
             self.settings["auto-perf-on-dock"] = True
             self.write_settings()
             print("Auto Perf on Dock enabled")
+        self.handle_timer_state_change()
 
     # Toggle custom-scripts-on-dock
     def toggle_custom_scripts_on_dock(self):
@@ -131,15 +138,17 @@ class SystemTrayIcon(QSystemTrayIcon):
             self.settings["custom-scripts-on-dock"] = True
             self.write_settings()
             print("Custom scripts on dock enabled")
+        self.handle_timer_state_change()
 
-    # Enable automatic switching to performance mode when docked
-    def disable_auto_perf_on_dock(self):
-        self.timer.stop()
-        self.set_thermal(self.last_thermal_mode)
-
-    # Disable automatic switching to performance mode when docked
-    def enable_auto_perf_on_dock(self):
-        self.timer.start(5000)
+    # Enable/Disable timer based on the current state of the settings.
+    # This should be triggered whenever the settings are changed and when the app starts
+    def handle_timer_state_change(self):
+        if self.settings["auto-perf-on-dock"] or self.settings["custom-scripts-on-dock"]:
+            print("Starting timer")
+            self.timer.start(5000)
+        else:
+            print("Stopping timer")
+            self.timer.stop()
 
     # Handle signal for dock status change
     def check_docking_status(self):
@@ -150,16 +159,39 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     # Handle actions when dock status changes
     def handle_dock(self, docked):
-        # If the system is docked and the thermal mode is not performance set it to performance
-        if docked and self.thermal_mode != "performance":
-            self.set_thermal("performance")
+        if docked:
+            # If the system is docked and auto-perf-on-dock is enabled it should set the thermal mode to performance
+            if self.settings["auto-perf-on-dock"] and self.thermal_mode != "performance":
+                self.set_thermal("performance")
+            # If the system is docked and custom-scripts-on-dock is enabled it should run the custom scripts
+            if self.settings["custom-scripts-on-dock"] and self.last_dock_state != docked:
+                self.run_custom_scripts(docked)
+                self.last_dock_state = docked
         elif not docked:
-            # If the system is undocked and the thermal mode is the last manually set thermal mode it should do nothing
-            if self.thermal_mode == self.last_thermal_mode:
-                pass
-            # If the system is undocked and the last manually set thermal mode is not the current thermal mode it should set the thermal mode to the last manually set thermal mode
-            elif self.thermal_mode != self.last_thermal_mode:
+            # If the system is undocked and the last manually set thermal mode is not the current
+            # thermal mode it should set the thermal mode to the last manually set thermal mode
+            if self.thermal_mode != self.last_thermal_mode:
                 self.set_thermal(self.last_thermal_mode)
+            # If the system is undocked and custom-scripts-on-dock is enabled
+            # it should run the custom scripts
+            if self.settings["custom-scripts-on-dock"] and self.last_dock_state != docked:
+                self.run_custom_scripts(docked)
+                self.last_dock_state = docked
+
+    # Run custom scripts
+    def run_custom_scripts(self, docked):
+        if docked:
+            # Run ./custom_scripts/on_dock.sh
+            try:
+                os.system(f"{dir}/custom_scripts/on_dock.sh")
+            except Exception as e:
+                print(f"Error while running on_dock.sh: {e}")
+        elif not docked:
+            # Run ./custom_scripts/off_dock.sh
+            try:
+                os.system(f"{dir}/custom_scripts/off_dock.sh")
+            except Exception as e:
+                print(f"Error while running off_dock.sh: {e}")
 
     # Write the last manually set thermal mode to state and file
     def write_last_thermal_mode(self, mode):
