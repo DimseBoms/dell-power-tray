@@ -1,4 +1,4 @@
-import sys, os, smbios_interface, json
+import sys, os, smbios_interface, json, traceback
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QTimer
@@ -14,16 +14,9 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.thermal_mode = self.smbios.get_thermal()
         self.battery_mode = self.smbios.get_battery()
 
-        # Create settings file if it doesn't exist
+        # Initialize settings
         dir = os.path.dirname(os.path.realpath(__file__))
-        if not os.path.exists(f"{dir}/settings.json"):
-            self.init_settings()
-        # Read settings into dict
-        try:
-            with open(f"{dir}/settings.json", "r") as f:
-                self.settings = json.load(f)
-        except Exception as e:
-            print(f"Error while reading settings file: {e}")
+        self.init_settings()
 
         # Initialize the display and power observer
         self.display_power_observer = DisplayPowerObserver()
@@ -60,15 +53,24 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         self.menu.addSeparator()
 
-        # Add button to enable/disable auto-perf-on-dock
-        auto_perf_on_dock_entry = QAction(f"Automatic performance mode when docked", self)
-        auto_perf_on_dock_entry.setChecked(self.settings["auto-perf-on-dock"])
+        # Add options entry to the menu
+        self.options_entry = self.menu.addMenu("Options")
         if self.kde:
-            auto_perf_on_dock_entry.setIcon(QIcon.fromTheme("preferences-system"))
+            self.options_entry.setIcon(QIcon.fromTheme("preferences-system"))
+
+        # Add button to enable/disable auto-perf-on-dock to the options entry
+        auto_perf_on_dock_entry = QAction(f"Automatic performance mode when docked", self)
         auto_perf_on_dock_entry.setCheckable(True)
         auto_perf_on_dock_entry.setChecked(self.settings["auto-perf-on-dock"])
         auto_perf_on_dock_entry.triggered.connect(self.toggle_auto_perf_on_dock)
-        self.menu.addAction(auto_perf_on_dock_entry)
+        self.options_entry.addAction(auto_perf_on_dock_entry)
+
+        # Add option to enable/disable custom-scripts-on-dock to the options entry
+        custom_scripts_on_dock_entry = QAction(f"Run custom scripts when docked", self)
+        custom_scripts_on_dock_entry.setCheckable(True)
+        custom_scripts_on_dock_entry.setChecked(self.settings["custom-scripts-on-dock"])
+        custom_scripts_on_dock_entry.triggered.connect(self.toggle_custom_scripts_on_dock)
+        self.options_entry.addAction(custom_scripts_on_dock_entry)
 
         self.menu.addSeparator()
 
@@ -112,14 +114,23 @@ class SystemTrayIcon(QSystemTrayIcon):
             self.disable_auto_perf_on_dock()
             self.settings["auto-perf-on-dock"] = False
             self.write_settings()
-            self.menu.actions()[2].setText(f"Automatic performance mode when docked: {self.settings['auto-perf-on-dock']}")
             print("Auto Perf on Dock disabled")
         else:
             self.enable_auto_perf_on_dock()
             self.settings["auto-perf-on-dock"] = True
             self.write_settings()
-            self.menu.actions()[2].setText(f"Automatic performance mode when docked: {self.settings['auto-perf-on-dock']}")
             print("Auto Perf on Dock enabled")
+
+    # Toggle custom-scripts-on-dock
+    def toggle_custom_scripts_on_dock(self):
+        if self.settings["custom-scripts-on-dock"]:
+            self.settings["custom-scripts-on-dock"] = False
+            self.write_settings()
+            print("Custom scripts on dock disabled")
+        else:
+            self.settings["custom-scripts-on-dock"] = True
+            self.write_settings()
+            print("Custom scripts on dock enabled")
 
     # Enable automatic switching to performance mode when docked
     def disable_auto_perf_on_dock(self):
@@ -220,14 +231,27 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     # Function to initialize the settings
     def init_settings(self):
-        # Check if the settings file exists if it doesn't create it
-        if not os.path.exists(f"{dir}/settings.json"):
-            with open(f"{dir}/settings.json", "w") as f:
-                # Create dict containing the default settings
-                settings = {
-                    "auto-perf-on-dock": True,
-                }
-                json.dump(settings, f)
+        default_settings = {
+            "auto-perf-on-dock": True,
+            "custom-scripts-on-dock": False
+        }
+        try: # Try to load the settings file and make sure all settings are present
+            settings = json.load(open(f"{dir}/settings.json", "r"))
+            for i in default_settings:
+                if i not in settings:
+                    settings[i] = default_settings[i]
+            # Load the settings into the proper settings variable and write them to the file
+            self.settings = settings
+            self.write_settings()
+        except:
+            try: # If the settings file doesn't exist or is corrupt create a new one
+                with open(f"{dir}/settings.json", "w") as f:
+                    # Create dict containing the default settings
+                    json.dump(default_settings, f)
+                # Load them into the settings variable
+                self.settings = default_settings
+            except Exception as e:
+                print(f"Error while initializing settings: {e}")
 
     # Function to read settings
     def read_settings(self):
