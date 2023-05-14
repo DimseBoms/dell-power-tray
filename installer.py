@@ -17,6 +17,15 @@ def install():
     Type=Application
     Categories=Utility;"""
 
+    # Make sure that ~/.local/share/applications exists
+    try:
+        home = os.path.expanduser("~")
+        os.makedirs(f"{home}/.local/share/applications", exist_ok=True)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Failed to create ~/.local/share/applications: {e}")
+
     # Write the .desktop file to ~/.local/share/applications
     try:
         home = os.path.expanduser("~")
