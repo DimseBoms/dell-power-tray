@@ -11,7 +11,7 @@ def install():
     desktop_file = f"""[Desktop Entry]
     Name=Dell Power Tray
     Comment=Power management for Dell laptops
-    Exec={python_path} {current_dir}/main.py
+    Exec={current_dir}/launch.sh
     Icon={current_dir}/icons/icon.png
     Terminal=false
     Type=Application
