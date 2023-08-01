@@ -21,7 +21,7 @@ sudo dnf install python3-pip python3-virtualenv
 # On Ubuntu
 sudo apt update && sudo apt install python3-pip python3-virtualenv
 ```
-* PyQt5 (Installed via pip. See instructions below)
+* PyQt6 (Installed via pip. See instructions below)
 # Installation
 * Navigate to where you want your project to reside:
 ```

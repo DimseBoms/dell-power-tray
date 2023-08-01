@@ -1,7 +1,7 @@
 import sys, os, smbios_interface, json
-from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer
+from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+from PyQt6.QtGui import QIcon, QAction
+from PyQt6.QtCore import QTimer
 from display_power_observer import DisplayPowerObserver
 
 class SystemTrayIcon(QSystemTrayIcon):
@@ -339,4 +339,4 @@ if __name__ == "__main__":
     tray_icon.icon_refresh()
 
     # Run the application
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
