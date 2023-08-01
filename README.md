@@ -10,12 +10,12 @@ sudo dnf install *smbios*
 ```
 ```
 # On Ubuntu
-sudo apt update && sudo apt install smbios-utils python3-libsmbios
+sudo apt update && sudo apt install *smbios*
 ```
 * PyQt6
 ```
 # On Fedora
-sudo dnf install python3-qt6
+sudo dnf install python3-pyqt6
 ```
 ```
 # On Ubuntu
