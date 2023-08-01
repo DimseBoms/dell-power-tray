@@ -133,3 +133,6 @@ last_thermal_mode
 
 # User settings
 settings.json
+
+# Local settings
+last_thermal_mode

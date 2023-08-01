@@ -3,7 +3,7 @@ Power management for Dell laptops
 
 ![Example Image](./images/image.png)
 # Requirements
-* libsmbios binary utilities (https://github.com/dell/libsmbios). This one is probably available in your package manager.
+* libsmbios utilities (https://github.com/dell/libsmbios). This one is probably available in your package manager.
 ```
 # On Fedora
 sudo dnf install *smbios*
@@ -12,16 +12,15 @@ sudo dnf install *smbios*
 # On Ubuntu
 sudo apt update && sudo apt install smbios-utils python3-libsmbios
 ```
-* Python package manager: pip
+* PyQt6
 ```
 # On Fedora
-sudo dnf install python3-pip python3-virtualenv
+sudo dnf install python3-qt6
 ```
 ```
 # On Ubuntu
-sudo apt update && sudo apt install python3-pip python3-virtualenv
+sudo apt update && sudo apt install python3-pyqt6
 ```
-* PyQt6 (Installed via pip. See instructions below)
 # Installation
 * Navigate to where you want your project to reside:
 ```
@@ -35,12 +34,6 @@ git clone https://github.com/DimseBoms/dell-power-tray
 * navigate to newly downloaded project:
 ```
 cd dell-power-tray
-```
-* Set up python virtual environment and install requirements:
-```
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements.txt
 ```
 * Run the application:
 ```
